@@ -5,6 +5,21 @@ public class ProcessedAPIDataDto {
 	private String apiURI;
 	private Long countDifference;
 	private Double durationDifference;
+	
+	public ProcessedAPIDataDto() {
+	}
+	
+	
+	
+	public ProcessedAPIDataDto(String apiURI, Long countDifference, Double durationDifference) {
+		super();
+		this.apiURI = apiURI;
+		this.countDifference = countDifference;
+		this.durationDifference = durationDifference;
+	}
+
+
+
 	public String getApiURI() {
 		return apiURI;
 	}

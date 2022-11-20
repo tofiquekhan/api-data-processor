@@ -24,6 +24,21 @@ public class APIDataDto {
 		this.duration = duration;
 	}
 	
+	@Override
+	public int hashCode() {
+		int result = 9;
+		if(apiURI !=null) {
+			result = 21 * result + apiURI.hashCode();
+		}
+		return result;
+	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this)
+			return true;
+		APIDataDto dataDto = (APIDataDto)obj;
+		return this.apiURI.equals(dataDto.getApi());
+	}
 
 }
