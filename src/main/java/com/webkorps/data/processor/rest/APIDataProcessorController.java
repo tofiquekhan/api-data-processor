@@ -28,18 +28,17 @@ public class APIDataProcessorController {
 	}
 
 	@PostMapping
-	public ResponseEntity<HashSet<ProcessedAPIDataDto>> processData(@RequestParam("file1") MultipartFile file1,@RequestParam("file2") MultipartFile file2) {
-//		if(file1.isEmpty() || file2.isEmpty()) {
+	public ResponseEntity<HashSet<ProcessedAPIDataDto>> processData(@RequestParam("lastFile") MultipartFile lastFile,@RequestParam("currentFile") MultipartFile currentFile) {
+//		if(lastFile.isEmpty() || currentFile.isEmpty()) {
 //			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request must contain file");
 //			 
 //		}
-		
-//		if(!file1.getContentType().equals("text/csv")||!file2.getContentType().equals("text/csv")) {
+//		
+//		if(!lastFile.getContentType().equals("text/csv")||!currentFile.getContentType().equals("text/csv")) {
 //			return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("Only CSV file Parse");
 //		}
-//		DataStoreResult dsr = employeeService.storeInDatabase(file);
-		dataProcessorService.apiDataProcessor(file1, file2);
-		return ResponseEntity.ok(dataProcessorService.apiDataProcessor(file1, file2));
+		dataProcessorService.apiDataProcessor(lastFile, currentFile);
+		return ResponseEntity.ok(dataProcessorService.apiDataProcessor(lastFile, currentFile));
 		
 	}
 	

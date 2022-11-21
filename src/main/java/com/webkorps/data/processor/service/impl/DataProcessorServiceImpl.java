@@ -1,5 +1,6 @@
 package com.webkorps.data.processor.service.impl;
 
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -7,6 +8,11 @@ import java.util.HashSet;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,54 +27,54 @@ public class DataProcessorServiceImpl implements DataProcessorService{
 	
 
 	@Override
-	public HashSet<ProcessedAPIDataDto> apiDataProcessor(MultipartFile dataFile1,MultipartFile dataFile2){
+	public HashSet<ProcessedAPIDataDto> apiDataProcessor(MultipartFile lastFile,MultipartFile currentFile){
 		HashSet<ProcessedAPIDataDto> processedAPIDataDtos = new HashSet<ProcessedAPIDataDto>();
-		HashSet<APIDataDto> apiDataDtos1 = excelToHashSet(dataFile1);
-		HashSet<APIDataDto> apiDataDtos2 = excelToHashSet(dataFile2);
-		ArrayList<APIDataDto> apiDataDtos2List = new ArrayList<APIDataDto>(apiDataDtos2);
-		for(APIDataDto dataDto: apiDataDtos1) {
-			System.out.println("DataProcessorServiceImpl.apiDataProcessor().apiDataDtos1 "+dataDto.hashCode() +" contains in apiDataDtos2 = "+apiDataDtos2.contains(dataDto));
-			if(apiDataDtos2.contains(dataDto)) {
+		HashSet<APIDataDto> lastFileApiDataDtos = excelToHashSet(lastFile);
+		HashSet<APIDataDto> currentFileApiDataDtos = excelToHashSet(currentFile);
+		ArrayList<APIDataDto> currentFileApiDataDtosList = new ArrayList<APIDataDto>(currentFileApiDataDtos);
+		for(APIDataDto lastFileApiDataDto: lastFileApiDataDtos) {
+			if(currentFileApiDataDtos.contains(lastFileApiDataDto)) {
 				System.out.println("DataProcessorServiceImpl.apiDataProcessor() in if statement checking contains or not");
-				int index = apiDataDtos2List.indexOf(dataDto);
-				APIDataDto dataDto2 = apiDataDtos2List.get(index);
-				ProcessedAPIDataDto processedAPIDataDto = new ProcessedAPIDataDto(dataDto.getApi(),dataDto.getCount()-dataDto2.getCount(),dataDto.getDuration()-dataDto2.getDuration());
+				int index = currentFileApiDataDtosList.indexOf(lastFileApiDataDto);
+				APIDataDto currentFileApiDataDto = currentFileApiDataDtosList.get(index);
+				ProcessedAPIDataDto processedAPIDataDto = new ProcessedAPIDataDto(lastFileApiDataDto.getApi(),lastFileApiDataDto.getCount()-currentFileApiDataDto.getCount(),lastFileApiDataDto.getDuration()-currentFileApiDataDto.getDuration());
 				processedAPIDataDtos.add(processedAPIDataDto);
 			}
 		}
-				System.out.println("DataProcessorServiceImpl.apiDataProcessor() processedAPIDataDtos"+processedAPIDataDtos);
 		return processedAPIDataDtos;
 	}
 	
 	public static HashSet<APIDataDto> excelToHashSet(MultipartFile multipartFile){
 		
 		HashSet<APIDataDto> apiDataDtos = null;
-		
-		
-		
 		try {
 
-			Reader in = new InputStreamReader(multipartFile.getInputStream());
-			Iterable<CSVRecord> records= CSVFormat.EXCEL.builder().setSkipHeaderRecord(true).setHeader("request url", "count", "duration").build().parse(in).getRecords();
-			apiDataDtos = new HashSet<APIDataDto>();
-			for (CSVRecord record : records) {
-			    try {
-			    APIDataDto apiDataDto = new APIDataDto();
-			    apiDataDto.setApi(record.get("request url")); 
-			    apiDataDto.setCount(Long.parseLong(record.get("count")));
-			    apiDataDto.setDuration(Double.parseDouble(record.get("duration")));
-			    apiDataDtos.add(apiDataDto);
+			FileInputStream  in = (FileInputStream )multipartFile.getInputStream();
+			XSSFWorkbook  workbook = new XSSFWorkbook(in);
+			XSSFSheet sheet  = workbook.getSheetAt(0);  
+			for (Row row : sheet) {
+			    for (Cell cell : row) {
+			    	System.out.println("DataProcessorServiceImpl.excelToHashSet() cell = "+cell);
+//			    	System.out.print(cell.getStringCellValue());
+			        }
+			    }
+//			Iterable<CSVRecord> records= CSVFormat.EXCEL.builder().setSkipHeaderRecord(true).setHeader("request url", "count", "duration").build().parse(in).getRecords();
+//			apiDataDtos = new HashSet<APIDataDto>();
+//			for (CSVRecord record : records) {
+//			    try {
+//			    APIDataDto apiDataDto = new APIDataDto();
+//			    apiDataDto.setApi(record.get("request url")); 
+//			    apiDataDto.setCount(Long.parseLong(record.get("count")));
+//			    apiDataDto.setDuration(Double.parseDouble(record.get("duration")));
+//			    apiDataDtos.add(apiDataDto);
+//			    
 			    
-			    }catch (Exception e) {
-			    	e.printStackTrace();
-					continue;
-				}
-			}
+			
 		}catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		
-//System.out.println("DataProcessorServiceImpl.excelToHashSet() " +apiDataDtos);		
 		return apiDataDtos;
 	}
 	

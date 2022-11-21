@@ -8,6 +8,6 @@ import com.webkorps.data.processor.dto.ProcessedAPIDataDto;
 
 public interface DataProcessorService {
 
-	public HashSet<ProcessedAPIDataDto> apiDataProcessor(MultipartFile dataFile1,MultipartFile dataFile2) ;
+	public HashSet<ProcessedAPIDataDto> apiDataProcessor(MultipartFile lastFile,MultipartFile currentFile) ;
 	
 }
